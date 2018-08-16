@@ -16,8 +16,7 @@ client.on("guildCreate", guild => {
 
 /// Updates the bot's status if he leaves a servers
 client.on("guildDelete", guild => {
-    client.user.setGame(
-        `${client.guilds.size} servers | >עזרה`);
+    client.user.setGame(`${client.guilds.size} servers | >עזרה`);
 });
 
 
@@ -199,7 +198,6 @@ if(cmd === (`${prefix}מיאני`)) {
           message.channel.send(embed)
       } else {
           message.channel.send('המשתמש לא שומע מוזיקה כרגע או שספוטיפיי לא דלוק בפליינג!');
-      }
       }
 });
 
