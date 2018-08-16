@@ -5,137 +5,192 @@ const bot = new Discord.Client({disableEveryone: true});
 
 bot.on("ready", async () => {
   console.log(`${bot.user.username} is online!`);
-
-  bot.user.setActivity("tutorials on TSC", {type: "DEVELOP"});
-
-  //bot.user.setGame("on SourceCade!");
+  bot.user.setActivity(`IM PRO NODER`, {type: `listening`})
+  .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
+  .catch (console.error);
 });
 
-bot.on("message", async message => {
-  if(message.author.bot) return;
-  if(message.channel.type === "dm") return;
 
-  let prefix = botconfig.prefix;
+
+bot.on("message", async message => {
+    const logsCommands = bot.channels.get(botconfig.logsChannelID);
+
+  if(message.channel.type == "dm") {
+    console.log(`${message.author.tag} שלח לי הודעה פרטית!`);
+    return logsCommands.send(`${message.author.tag} שלח לי הודעה פרטית!`);
+}
+
+  let prefix = process.env.BOT_PREFIX;
   let messageArray = message.content.split(" ");
   let cmd = messageArray[0];
   let args = messageArray.slice(1);
 
-  if(cmd === `${prefix}kick`){
+  //profile image command
+if(cmd === `${prefix}פרופיל`){
+  let user = message.mentions.users.first() || message.author;
+  let embed = new Discord.RichEmbed()
+  .setAuthor(`${user.username}`)
+  .setImage(user.displayAvatarURL)
+  .setColor('RANDOM')
+  .setFooter(`יוצר הבוט: avishaiDV#0069`);
+  message.channel.send(embed)
+  .catch(console.error)
+}
 
-    //!kick @daeshan askin for it
+//test
+    if(cmd === `${prefix}test`){
+      let embed = new Discord.RichEmbed()
+      .setThumbnail()
+      message.channel.send(embed)
 
-    let kUser = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
-    if(!kUser) return message.channel.send("Can't find user!");
-    let kReason = args.join(" ").slice(22);
-    if(!message.member.hasPermission("MANAGE_MESSAGES")) return message.channel.send("No can do pal!");
-    if(kUser.hasPermission("MANAGE_MESSAGES")) return message.channel.send("That person can't be kicked!");
+    }
 
-    let kickEmbed = new Discord.RichEmbed()
-    .setDescription("~Kick~")
-    .setColor("#e56b00")
-    .addField("Kicked User", `${kUser} with ID ${kUser.id}`)
-    .addField("Kicked By", `<@${message.author.id}> with ID ${message.author.id}`)
-    .addField("Kicked In", message.channel)
-    .addField("Tiime", message.createdAt)
-    .addField("Reason", kReason);
 
-    let kickChannel = message.guild.channels.find(`name`, "incidents");
-    if(!kickChannel) return message.channel.send("Can't find incidents channel.");
+
+//ping
+if(cmd === `${prefix}פינג`){
+ let embed = new Discord.RichEmbed()
+ .addField(message.author.ping);
+ message.channel.send(embed)
+}
+
+//kick command
+  if(cmd === `${prefix}העף`){
+     let kUser = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+     if(!kUser) return message.channel.send("לא הצלחתי למצוא משתמש!");
+     let kReason = args.join(" ").slice(22);
+     if(!message.member.hasPermission("MANAGE_MESSAGES")) return message.channel.send("אין לך גישות!")
+     if(kUser.hasPermission("MANAGE_MESSAGES")) return message.channel.send("אתה לא יכול להעיף אותו!");
+  let kickEmbed = new Discord.MessageEmbed()
+  .setDescription("~הרחקה~")
+  .setColor("#42f4e8")
+  .addField("משתמש מורחק", `${kUser} ID ${kUser.id}`)
+  .addField("מרחיק", `<@${message.author.id}> ID ${message.author.id}`)
+  .addField("חדר מרחיק", message.channel)
+  .addField("זמן הרחקה", message.createdAt)
+  .addField("סיבה", kReason);
+
+  console.log(`${message.author.tag} שלח לי הודעה פרטית!`);
+  return logsCommands.send(`${message.author.tag} שלח לי הודעה פרטית!`);
+
+  let kickChannel = message.guild.channels.find(`name`, "kicks-and-bans")
+  if(!kickChannel) return message.channel.send("לא הצלחתי למצוא חדר kicks-and-bans!")
 
     message.guild.member(kUser).kick(kReason);
-    kickChannel.send(kickEmbed);
-
+    KickChannel.send(kickEmbed);
     return;
   }
 
-  if(cmd === `${prefix}ban`){
+//report command
+    if(cmd === `${prefix}דווח`){
+      let rUser = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+      if(!rUser) return message.channel.send(`${message.author}לא ניתן למצוא משתמשים.`);
+      let reason = args.join(" ").slice(22);
 
-    let bUser = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
-    if(!bUser) return message.channel.send("Can't find user!");
-    let bReason = args.join(" ").slice(22);
-    if(!message.member.hasPermission("MANAGE_MEMBERS")) return message.channel.send("No can do pal!");
-    if(bUser.hasPermission("MANAGE_MESSAGES")) return message.channel.send("That person can't be kicked!");
-
-    let banEmbed = new Discord.RichEmbed()
-    .setDescription("~Ban~")
-    .setColor("#bc0000")
-    .addField("Banned User", `${bUser} with ID ${bUser.id}`)
-    .addField("Banned By", `<@${message.author.id}> with ID ${message.author.id}`)
-    .addField("Banned In", message.channel)
-    .addField("Time", message.createdAt)
-    .addField("Reason", bReason);
-
-    let incidentchannel = message.guild.channels.find(`name`, "incidents");
-    if(!incidentchannel) return message.channel.send("Can't find incidents channel.");
-
-    message.guild.member(bUser).ban(bReason);
-    incidentchannel.send(banEmbed);
+      let reportEmbed = new Discord.RichEmbed()
+      .setDescription("דיווח")
+      .setColor("#e82c1b")
+      .setThumbnail(message.author.displayAvatarURL)
+      .addField("משתמש מדווח", `${rUser} ID המשתמש המדווח: ${rUser.id}`)
+      .addField("מדווח", `${message.author} ID המדווח ${message.author.id}`)
+      .addField("חדר", message.channel)
+      .addField("זמן הדיווח", message.createdAt)
+      .addField("סיבה", reason);
 
 
-    return;
-  }
+      if(!reason) return message.channel.send("בבקשה ציין את סיבת הדיווח");
+      let reportschannel = message.guild.channels.find(`name`, "reports");
+      if(!reportschannel) return message.channel.send("בבקשה צור חדר reports");
+
+      message.delete().catch(O_o=>{});
+      reportschannel.send(reportEmbed);
+      console.log(`${message.author.tag} דיווח על משתמש!`);
+      return logsCommands.send(`${message.author.tag} דיווח על משתמש!`);
+      return;
+
+      message.channel.send(reportEmbed);
+      return;
+    }
+
+//voldba
+
+    if(cmd=== `${prefix}וולדבע`){
+      let embed = new Discord.RichEmbed()
+
+    .setDescription("איסטראג וולדבעי במיוחד!")
+    .addField("וולדבע נודר!", message.createdAt)
+    .setColor('RANDOM')
+    .setFooter("יוצר הבוט: avishaiDV#0069");
 
 
-  if(cmd === `${prefix}report`){
+    message.channel.send(embed);
+    console.log(`${message.author.tag} השתמש בוולדבע!`);
+    return logsCommands.send(`${message.author.tag} השתמש בוולדבע!!`);
 
-    //!report @ned this is the reason
-
-    let rUser = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
-    if(!rUser) return message.channel.send("Couldn't find user.");
-    let rreason = args.join(" ").slice(22);
-
-    let reportEmbed = new Discord.RichEmbed()
-    .setDescription("Reports")
-    .setColor("#15f153")
-    .addField("Reported User", `${rUser} with ID: ${rUser.id}`)
-    .addField("Reported By", `${message.author} with ID: ${message.author.id}`)
-    .addField("Channel", message.channel)
-    .addField("Time", message.createdAt)
-    .addField("Reason", rreason);
-
-    let reportschannel = message.guild.channels.find(`name`, "reports");
-    if(!reportschannel) return message.channel.send("Couldn't find reports channel.");
+    }
 
 
-    message.delete().catch(O_o=>{});
-    reportschannel.send(reportEmbed);
-
-    return;
-  }
-
-
-
-
-  if(cmd === `${prefix}serverinfo`){
-
-    let sicon = message.guild.iconURL;
-    let serverembed = new Discord.RichEmbed()
-    .setDescription("Server Information")
-    .setColor("#15f153")
-    .setThumbnail(sicon)
-    .addField("Server Name", message.guild.name)
-    .addField("Created On", message.guild.createdAt)
-    .addField("You Joined", message.member.joinedAt)
-    .addField("Total Members", message.guild.memberCount);
-
-    return message.channel.send(serverembed);
-  }
+//server info
+    if(cmd === `${prefix}שרת`){
+      let sicon = message.guild.iconURL;
+      let serverembed = new Discord.RichEmbed()
+      .setDescription("מידע השרת")
+      .setColor("#75aaff")
+      .setThumbnail(sicon)
+      .addField("שם השרת", message.guild.name)
+      .addField("תאריך הקמת השרת", message.guild.createdAt)
+      .addField("תאריך כניסתך לשרת", message.member.joinedAt)
+      .addField("מספר אנשים ב", message.guild.memberCount)
+      .addField("ID", message.guild.id)
+      .setFooter("יוצר הבוט: avishaiDV#0069");
 
 
+      return message.channel.send(serverembed);
+    }
+//simple test command
+    if(cmd === `${prefix}שלום`){
+      return message.channel.send("Hi there!");
+          }
+//bot info
+if(cmd === (`${prefix}מיאני`)) {
+  let bicon = bot.user.displayAvatarURL;
+  let botembed = new Discord.RichEmbed()
+  .setDescription("מידע על הבוט")
+  .setColor("#2e34dd")
+  .setThumbnail(bicon)
+  .addField("שם הבוט", bot.user.username)
+  .addField("תאריך יצור", bot.user.createdAt)
+  .addField("ID", bot.user.id);
+  return message.channel.send(botembed);
+}
 
-  if(cmd === `${prefix}botinfo`){
+//spotify command
+      if(cmd === `${prefix}ספוטיפיי`){
+          let user = message.mentions.users.first() || message.author;
 
-    let bicon = bot.user.displayAvatarURL;
-    let botembed = new Discord.RichEmbed()
-    .setDescription("Bot Information")
-    .setColor("#15f153")
-    .setThumbnail(bicon)
-    .addField("Bot Name", bot.user.username)
-    .addField("Created On", bot.user.createdAt);
+          if (user.presence.activity !== null && user.presence.activity.type === 'LISTENING' && user.presence.activity.name === 'Spotify'
+      && user.presence.activity.assets !== null) {
+          let trackIMG = `https://i.scdn.co/image/${user.presence.activity.assets.largeImage.slice(8)}`;
+          let trackURL = `https://open.spotify.com/track/${user.presence.activity.syncID}`;
+          let trackName = user.presence.activity.details;
+          let trackAuthor = user.presence.activity.state;
+          let trackAlbum = user.presence.activity.assets.largeText;
 
-    return message.channel.send(botembed);
-  }
+          const embed = new Discord.RichEmbed()
+          .setAuthor('מידע על השיר בספוטיפיי', 'https://cdn.discordapp.com/emojis/408668371039682560')
+          .setColor("#1abc48")
+          .setThumbnail(trackIMG)
+          .addField('שם השיר', trackName, true)
+          .addField('אלבום', trackAlbum, true)
+          .addField('יוצר', trackAuthor, false)
+          .addField('קישור להאזנה בספוטיפיי:', `${trackURL}`, false)
+          .setFooter("יוצר הבוט: avishaiDV#0069")
+          message.channel.send(embed)
+      } else {
+          message.channel.send('המשתמש לא שומע מוזיקה כרגע או שספוטיפיי לא דלוק בפליינג!');
+      }
+      }
 
-});
+  });
 
 bot.login(process.env.BOT_TOKEN);
