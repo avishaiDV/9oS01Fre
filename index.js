@@ -2,20 +2,19 @@ const botconfig = require("./botconfig.json");
 const Discord = require("discord.js");
 
 const bot = new Discord.Client({disableEveryone: true});
-
  bot.on('ready', () => {
    console.log(`${bot.user.username} is online!`);
-  bot.user.setGame(`${client.guilds.size} servers | >עזרה`);
+  bot.user.setGame(`${bot.guilds.size} servers | >עזרה`);
 });
 
 // Updates the bot's status if he joins a server
 bot.on("guildCreate", guild => {
-   bot.user.setGame(`${client.guilds.size} servers | >עזרה`);
+   bot.user.setGame(`${bot.guilds.size} servers | >עזרה`);
 });
 
 /// Updates the bot's status if he leaves a servers
 bot.on("guildDelete", guild => {
-    bot.user.setGame(`${client.guilds.size} servers | >עזרה`);
+    bot.user.setGame(`${bot.guilds.size} servers | >עזרה`);
 });
 
 
