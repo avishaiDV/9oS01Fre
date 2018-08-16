@@ -7,18 +7,18 @@ bot.on("ready", async () => {
   console.log(`${bot.user.username} is online!`);
  client.on('ready', () => {
   console.log(`Bot is Online!`);
-  client.user.setGame(`${client.guilds.size} servers | .help`);
+  client.user.setGame(`${client.guilds.size} servers | >עזרה`);
 });
 
 // Updates the bot's status if he joins a server
 client.on("guildCreate", guild => {
-   client.user.setGame(`${client.guilds.size} servers | .help`);
+   client.user.setGame(`${client.guilds.size} servers | >עזרה`);
 });
 
 /// Updates the bot's status if he leaves a servers
 client.on("guildDelete", guild => {
     client.user.setGame(
-        `${client.guilds.size} servers | .help`);
+        `${client.guilds.size} servers | >עזרה`);
 });
   .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
   .catch (console.error);
