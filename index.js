@@ -199,6 +199,8 @@ if(cmd === (`${prefix}מיאני`)) {
       } else {
           message.channel.send('המשתמש לא שומע מוזיקה כרגע או שספוטיפיי לא דלוק בפליינג!');
   }
+  }
+  
+  
 });
-
 bot.login(process.env.BOT_TOKEN);
