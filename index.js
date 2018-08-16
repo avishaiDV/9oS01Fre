@@ -5,18 +5,18 @@ const bot = new Discord.Client({disableEveryone: true});
 
 bot.on("ready", async () => {
   console.log(`${bot.user.username} is online!`);
- client.on('ready', () => {
-  client.user.setGame(`${client.guilds.size} servers | >עזרה`);
+ bot.on('ready', () => {
+  bot.user.setGame(`${client.guilds.size} servers | >עזרה`);
 });
 
 // Updates the bot's status if he joins a server
-client.on("guildCreate", guild => {
-   client.user.setGame(`${client.guilds.size} servers | >עזרה`);
+bot.on("guildCreate", guild => {
+   bot.user.setGame(`${client.guilds.size} servers | >עזרה`);
 });
 
 /// Updates the bot's status if he leaves a servers
-client.on("guildDelete", guild => {
-    client.user.setGame(`${client.guilds.size} servers | >עזרה`);
+bot.on("guildDelete", guild => {
+    bot.user.setGame(`${client.guilds.size} servers | >עזרה`);
 });
 
 
