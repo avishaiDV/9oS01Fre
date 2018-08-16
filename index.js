@@ -5,7 +5,21 @@ const bot = new Discord.Client({disableEveryone: true});
 
 bot.on("ready", async () => {
   console.log(`${bot.user.username} is online!`);
-  bot.user.setActivity(`IM PRO NODER`, {type: `listening`})
+ client.on('ready', () => {
+  console.log(`Bot is Online!`);
+  client.user.setGame(`${client.guilds.size} servers | .help`);
+});
+
+// Updates the bot's status if he joins a server
+client.on("guildCreate", guild => {
+   client.user.setGame(`${client.guilds.size} servers | .help`);
+});
+
+/// Updates the bot's status if he leaves a servers
+client.on("guildDelete", guild => {
+    client.user.setGame(
+        `${client.guilds.size} servers | .help`);
+});
   .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
   .catch (console.error);
 });
