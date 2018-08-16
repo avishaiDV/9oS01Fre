@@ -201,6 +201,6 @@ if(cmd === (`${prefix}מיאני`)) {
       }
       }
 });
-}
 });
+}
 bot.login(process.env.BOT_TOKEN);
