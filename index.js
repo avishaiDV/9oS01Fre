@@ -4,7 +4,7 @@ const Discord = require("discord.js");
 const bot = new Discord.Client({disableEveryone: true});
 
  bot.on('ready', () => {
-   bot.log(`Bot is Online!`);
+   console.log(`${bot.user.username} is online!`);
   bot.user.setGame(`${client.guilds.size} servers | >עזרה`);
 });
 
