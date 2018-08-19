@@ -32,6 +32,26 @@ bot.on("message", async message => {
   let messageArray = message.content.split(" ");
   let cmd = messageArray[0];
   let args = messageArray.slice(1);
+ 
+ 
+ //help
+  if(cmd === `${prefix}עזרה`){
+    let icon = bot.user.displayAvatarURL;
+    let embed =  new Discord.RichEmbed()
+    .setDescription("עזרה")
+    .setThumbnail(bot.user.displayAvatarURL)
+    .addField("prefix", `>`)
+    .addField("Commands", `http://play.mikmak.co.il`)
+    .setFooter("יוצרי הבוט: avishaiDV & NiceGames")
+    .setColor('RANDOM')
+    .setThumbnail(icon);
+
+    message.channel.send(embed)
+    console.log(`${message.author.tag} ביקש עזרה מהבוט!`);
+    return logsCommands.send(`${message.author.tag} ביקש עזרה מהבוט!`);
+}
+
+ 
 
   //profile image command
 if(cmd === `${prefix}פרופיל`){
@@ -40,7 +60,7 @@ if(cmd === `${prefix}פרופיל`){
   .setAuthor(`${user.username}`)
   .setImage(user.displayAvatarURL)
   .setColor('RANDOM')
-  .setFooter(`יוצר הבוט: avishaiDV#0069`);
+  .setFooter(`יוצרי הבוט: avishaiDV & NiceGames`);
   message.channel.send(embed)
   .catch(console.error)
 }
@@ -78,8 +98,8 @@ if(cmd === `${prefix}פינג`){
   .addField("זמן הרחקה", message.createdAt)
   .addField("סיבה", kReason);
 
-  console.log(`${message.author.tag} שלח לי הודעה פרטית!`);
-  return logsCommands.send(`${message.author.tag} שלח לי הודעה פרטית!`);
+  console.log(`${message.author.tag} ניסה להעיף מישהו!`);
+  return logsCommands.send(`${message.author.tag} ניסה להעיף מישהו!`);
 
   let kickChannel = message.guild.channels.find(`name`, "kicks-and-bans")
   if(!kickChannel) return message.channel.send("לא הצלחתי למצוא חדר kicks-and-bans!")
