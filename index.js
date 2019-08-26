@@ -1,68 +1,159 @@
-const botconfig = require("./botconfig.json");
+
+const botconfig = require("./botconfig");
 const Discord = require("discord.js");
+const got = require(`got`);
+const api= 'dc6zaTOxFJmzC';
 
 const bot = new Discord.Client({disableEveryone: true});
- bot.on('ready', () => {
-   console.log(`${bot.user.username} is online!`);
-  bot.user.setGame(`${bot.guilds.size} servers | >עזרה`);
+bot.on("ready", async () => {
+  console.log(`${bot.user.username} is online!`);
+  bot.user.setActivity(`בתכנות :P`, {type: `listening`})
+  .then(presence => console.log(`Activity set to ${presence.game ? presence.game.name : 'none'}`))
+  .catch (console.error);
 });
-
-// Updates the bot's status if he joins a server
-bot.on("guildCreate", guild => {
-   bot.user.setGame(`${bot.guilds.size} servers | >עזרה`);
-});
-
-/// Updates the bot's status if he leaves a servers
-bot.on("guildDelete", guild => {
-    bot.user.setGame(`${bot.guilds.size} servers | >עזרה`);
-});
-
 
 
 
 bot.on("message", async message => {
     const logsCommands = bot.channels.get(botconfig.logsChannelID);
-
   if(message.channel.type == "dm") {
     console.log(`${message.author.tag} שלח לי הודעה פרטית!`);
     return logsCommands.send(`${message.author.tag} שלח לי הודעה פרטית!`);
 }
 
-  let prefix = process.env.BOT_PREFIX;
+  let prefix = botconfig.prefix;
   let messageArray = message.content.split(" ");
   let cmd = messageArray[0];
   let args = messageArray.slice(1);
+
+
+//dice command
+if(cmd === `${prefix}dice` || cmd === `${prefix}קוביה`){
+  let dice = ["🎲 1", "🎲 2", "🎲 3", "🎲 4", "🎲 5", "🎲 6"];
+  let result = Math.floor((Math.random() * dice.length));
+  message.channel.send(`${message.author} מספר הקוביה שלך הוא:` + dice[result]);
+}
+
+//join
+if(cmd === `${prefix}join` || cmd === `${prefix}הצטרף`){
+  let embed = new Discord.RichEmbed()
+  .setColor("#4286f4")
+  .addField("invite link", "https://discord.gg/zS3kDge")
+  .setDescription("The server of the beta of the bot");
+  message.channel.send(embed)
+}
+
+
+//bibi
+if(cmd === `${prefix}message`){
+  let msgid = args.join(" ").slice(17);
+  if(!msgid) return message.channel.send("cannot find any message id!");
+  message.channel.fetchMessage(msgid).send;
+
+}
+
+
+  //kill command
+  if(cmd === `${prefix}kill` || cmd === `${prefix}להרוג`){
+    let user = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
+    if(!user) return message.channel.send(`${message.author} את מי תרצה להרוג :smiling_imp: ?`);
+    if(message.mentions.users.first().id === message.author.id) return message.channel.send("אתה לא יכול להרוג את עצמך :joy:" + `${message.author}`);
+    let embed = new Discord.RichEmbed()
+    .setAuthor(message.author.tag)
+    .setColor("#f44e42")
+    .addField("רוצח :gun: : ", `${message.author}`)
+    .addField("קורבן :sheep: :", user);
+    channel.msg.send(embed)
+  }
  
+ //someone
+ if(cmd === `${prefix}someone` || cmd === `${prefix}מישהו`){
+  let someone = message.guild.members.random();
+  message.channel.send(`<@${message.author.id}> החבר החדש שלך: <@${someone.user.id}>`);
+}
+
+
+   //say command
+   if (cmd === `${prefix}תגיד` || cmd === `${prefix}say`){
+    // makes the bot say something and delete the message. As an example, it's open to anyone to use. 
+    // To get the "message" itself we join the `args` back into a string with spaces: 
+    const sayMessage = args.join(" ");
+    // Then we delete the command message (sneaky, right?). The catch just ignores the error with a cute smiley thing.
+    message.delete().catch(O_o=>{}); 
+    // And we get the bot to say the thing: 
+    if(!sayMessage) return message.channel.send(`${message.author} אתה צריך להגיד משהו!`)
+    message.channel.send(sayMessage);
+            console.log(`${message.author.tag} השתמש בפקודת חזור אחרי`);
+    return logsCommands.send(`${message.author.tag} השתמש בפקודה חזור אחרי`);
+  }
  
- //help
+
+//help
   if(cmd === `${prefix}עזרה`){
     let icon = bot.user.displayAvatarURL;
     let embed =  new Discord.RichEmbed()
     .setDescription("עזרה")
     .setThumbnail(bot.user.displayAvatarURL)
     .addField("prefix", `>`)
-    .addField("Commands", `http://play.mikmak.co.il`)
+    .addField("Commands")
     .setFooter("יוצרי הבוט: avishaiDV & NiceGames")
     .setColor('RANDOM')
-    .setThumbnail(icon);
-
+    .setThumbnail(icon)
+    .addField("הזמן אותי", "תכתוב בצאט >הזמן");
     message.channel.send(embed)
-    console.log(`${message.author.tag} ביקש עזרה מהבוט!`);
-    return logsCommands.send(`${message.author.tag} ביקש עזרה מהבוט!`);
 }
 
- 
+//conatct
 
-  //profile image command
+if(cmd === `${prefix}contact`){
+  let embed = new Discord.RichEmbed()
+   .addField("avishaiDV:", "avishaidv@gmail.com")
+   .addField("NiceGames", "oridev1@gmail.com")
+  .setFooter("יוצרי הבוט: avishaiDV & NiceGames")
+  .setColor("Green");
+  message.channel.send(embed)
+
+}
+
+//invite
+if(cmd === `${prefix}הזמן`){
+  let icon = bot.user.displayAvatarURL;
+  let embed = new Discord.RichEmbed()
+    .setDescription("הזמן אותי")
+    .addField("מיקמק", `https://discordapp.com/api/oauth2/authorize?client_id=466348486800048149&permissions=8&scope=bot`)
+    .setThumbnail(icon)
+    .setFooter("יוצרי הבוט: avishaiDV & NiceGames");
+  message.channel.send(embed)
+
+  console.log(`${message.author.tag} ביקש להזמין אותי!`);
+  return logsCommands.send(`${message.author.tag} ביקש להזמין אותי!`);
+}
+
+
+  //gif
+  if(cmd === `${prefix}גיף`){
+    if(args.length < 1) return message.channel.send("בבקשה תכתוב איזה גיף אתה מחפש")
+    const res = await got(`http://api.giphy.com/v1/gifs/random?api_key=${api}&tag=${encodeURIComponent(args.join(" "))}`, {json: true})
+    if(!res || !res.body || !res.body.data) return message.channel.send("לא הצלחתי למצוא גיף שמתאים לחיפוש שלך!")
+
+    let embed = new Discord.RichEmbed()
+    .setImage(res.body.data.image_url)
+    .setAuthor(message.author.tag)
+    .setFooter("יוצרי הבוט: avishaidv & NiceGames");
+
+    message.channel.send(embed)
+  }
+
+
+//profile image command
 if(cmd === `${prefix}פרופיל`){
   let user = message.mentions.users.first() || message.author;
   let embed = new Discord.RichEmbed()
   .setAuthor(`${user.username}`)
   .setImage(user.displayAvatarURL)
   .setColor('RANDOM')
-  .setFooter(`יוצרי הבוט: avishaiDV & NiceGames`);
+  .setFooter(`יוצר הבוט: avishaiDV#0069`);
   message.channel.send(embed)
-  .catch(console.error)
 }
 
 //test
@@ -76,9 +167,9 @@ if(cmd === `${prefix}פרופיל`){
 
 
 //ping
-if(cmd === `${prefix}פינג`){
+if(cmd === `${prefix}פינג` || cmd === `${prefix}ping` ){
  let embed = new Discord.RichEmbed()
- .addField(message.author.ping);
+ .addField("pong", "hi");
  message.channel.send(embed)
 }
 
@@ -87,25 +178,8 @@ if(cmd === `${prefix}פינג`){
      let kUser = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));
      if(!kUser) return message.channel.send("לא הצלחתי למצוא משתמש!");
      let kReason = args.join(" ").slice(22);
-     if(!message.member.hasPermission("MANAGE_MESSAGES")) return message.channel.send("אין לך גישות!")
-     if(kUser.hasPermission("MANAGE_MESSAGES")) return message.channel.send("אתה לא יכול להעיף אותו!");
-  let kickEmbed = new Discord.MessageEmbed()
-  .setDescription("~הרחקה~")
-  .setColor("#42f4e8")
-  .addField("משתמש מורחק", `${kUser} ID ${kUser.id}`)
-  .addField("מרחיק", `<@${message.author.id}> ID ${message.author.id}`)
-  .addField("חדר מרחיק", message.channel)
-  .addField("זמן הרחקה", message.createdAt)
-  .addField("סיבה", kReason);
-
-  console.log(`${message.author.tag} ניסה להעיף מישהו!`);
-  return logsCommands.send(`${message.author.tag} ניסה להעיף מישהו!`);
-
-  let kickChannel = message.guild.channels.find(`name`, "kicks-and-bans")
-  if(!kickChannel) return message.channel.send("לא הצלחתי למצוא חדר kicks-and-bans!")
-
-    message.guild.member(kUser).kick(kReason);
-    KickChannel.send(kickEmbed);
+     if(!message.member.hasPermission("MANAGE_MESSAGES")) return message.channel.reply("אין לך גישות!")
+     if(kUser.hasPermission("MANAGE_MESSAGES")) return message.channel.reply("אתה לא יכול להעיף אותו!");
     return;
   }
 
@@ -192,33 +266,30 @@ if(cmd === (`${prefix}מיאני`)) {
   return message.channel.send(botembed);
 }
 
-//spotify command
-      if(cmd === `${prefix}ספוטיפיי`){
-          let user = message.mentions.users.first() || message.author;
+//8Ball
+if(cmd === `${prefix}8ball` || cmd === `${prefix}בדולח`){
+if(!args[1]) return message.reply("זאת לא שאלה! :angry:");
+let Replies = ["כן", "לא", "בטח!", "ברוררררר", "לא חושב", "אני עסוק, שאל אותי אחר כך", "לא אחי", "בארור אחיי", "אממ", "אולי", "התשובה היא 3", "נע", "שטוכ", "שאלה מעניינת :)"];
 
-          if (user.presence.activity !== null && user.presence.activity.type === 'LISTENING' && user.presence.activity.name === 'Spotify'
-      && user.presence.activity.assets !== null) {
-          let trackIMG = `https://i.scdn.co/image/${user.presence.activity.assets.largeImage.slice(8)}`;
-          let trackURL = `https://open.spotify.com/track/${user.presence.activity.syncID}`;
-          let trackName = user.presence.activity.details;
-          let trackAuthor = user.presence.activity.state;
-          let trackAlbum = user.presence.activity.assets.largeText;
+let result = Math.floor((Math.random() * Replies.length));
+let question = args.slice(0).join(" ");
+let embed = new Discord.RichEmbed()
+.setAuthor(message.author.tag)
+.setColor("#a15eff")
+.addField("שאלה :thinking: ", question)
+.addField("תשובה :fire: ", Replies[result]);
+message.channel.send(embed);
+}
 
-          const embed = new Discord.RichEmbed()
-          .setAuthor('מידע על השיר בספוטיפיי', 'https://cdn.discordapp.com/emojis/408668371039682560')
-          .setColor("#1abc48")
-          .setThumbnail(trackIMG)
-          .addField('שם השיר', trackName, true)
-          .addField('אלבום', trackAlbum, true)
-          .addField('יוצר', trackAuthor, false)
-          .addField('קישור להאזנה בספוטיפיי:', `${trackURL}`, false)
-          .setFooter("יוצר הבוט: avishaiDV#0069")
-          message.channel.send(embed)
-      } else {
-          message.channel.send('המשתמש לא שומע מוזיקה כרגע או שספוטיפיי לא דלוק בפליינג!');
-  }
-  }
-  
-  
-});
+//randon number
+if(cmd === `${prefix}number`){
+  let result = Math.floor(Math.random() * 100) + 1;
+  let embed = new Discord.RichEmbed()
+.setAuthor(message.author.tag)
+.setColor("#a15eff")
+.addField("המספר :game_die: ", [result]);
+message.channel.send(embed);
+}
+
+  });
 bot.login(process.env.BOT_TOKEN);
